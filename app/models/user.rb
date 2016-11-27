@@ -7,14 +7,25 @@ class User < ActiveRecord::Base
                     uniqueness: { case_sensitive: false }
   has_secure_password
   
+  # Following
   has_many :following_relationships, class_name:  "Relationship", foreign_key: "follower_id", dependent: :destroy
   has_many :following_users, through: :following_relationships, source: :followed
+  
+  # Follower
   has_many :followed_relationships, class_name:  "Relationship", foreign_key: "followed_id", dependent: :destroy
   has_many :followed_users, through: :followed_relationships, source: :follower
-
+  
+  # Ownership
   has_many :ownerships , foreign_key: "user_id", dependent: :destroy
   has_many :items ,through: :ownerships
-
+  
+  # Want
+  has_many :wants, class_name: "Want", foreign_key: "user_id", dependent: :destroy
+  has_many :want_items , through: :wants, source: :item
+  
+  # Have
+  has_many :haves, class_name: "Have", foreign_key: "user_id", dependent: :destroy
+  has_many :have_items , through: :haves, source: :item
 
   # 他のユーザーをフォローする
   def follow(other_user)
@@ -29,22 +40,31 @@ class User < ActiveRecord::Base
     following_users.include?(other_user)
   end
 
-  ## TODO 実装
-  def have(item)
-  end
-
-  def unhave(item)
-  end
-
-  def have?(item)
-  end
-
+  ## TODO 実装 => finish
   def want(item)
+    wants.find_or_create_by(item_id: item.id)
   end
 
   def unwant(item)
+    want = wants.find_by(item_id: item.id)
+    want.destroy if want
   end
 
   def want?(item)
+    want_items.include?(item)
   end
+
+  def have(item)
+    haves.find_or_create_by(item_id: item.id)
+  end
+
+  def unhave(item)
+    have = haves.find_by(item_id: item.id)
+    have.destroy if have
+  end
+
+  def have?(item)
+    have_items.include?(item)
+  end
+
 end

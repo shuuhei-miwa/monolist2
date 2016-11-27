@@ -27,6 +27,12 @@ gem 'bcrypt', '~> 3.1.7'
 
 gem 'dotenv-rails', :groups => [:development, :test]
 
+# ER
+gem 'railroady'
+group :development, :test do
+  gem 'rails-erd'
+end
+
 gem 'bootstrap-sass'
 
 # http://webservice.rakuten.co.jp/sdk/ruby.html
